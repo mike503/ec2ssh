@@ -20,3 +20,8 @@ Notes:
 
 * All instances must be accessible by private IP. If someone wanted to write logic to check private IP, then fall back to public, that would be neat. However, my use case doesn't require it.
 * I've tried my best to make it as failsafe as possible. Bash is annoying to deal with though, so there might be edge cases where it still breaks.
+
+TODO:
+
+* bash completion of instance names
+* if there are mutliple instance matches, prompt the user for which to connect to?
