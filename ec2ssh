@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+# jq is required: https://stedolan.github.io/jq/
+JQ=`which jq`
+if [ "${JQ}no" = "no" ]; then
+  echo "This script requires jq to run. Have a friendly sysadmin run: sudo apt-get -y install jq"
+  exit 255
+fi
+
+function usage() {
+    cat <<EOM
+### ec2ssh ###
+
+Simple script for us lazy people to use AWS API to lookup the information needed to SSH.
+
+It will check if you have the right keyfile (as defined by the EC2 instance information)
+
+Optional arguments:
+    -u | --user       Force the SSH username. (Default: derived by API)
+    -i | --identity   Force the SSH key file. (Default: /home/$USER/.ssh/KEYFILE.pem)
+
+Examples:
+
+    Default:
+        ec2 instancename
+
+    Overriding the SSH username:
+        ec2ssh -u foo instancename
+
+    Overriding the SSH private key file used:
+        ec2ssh -i ~/.ssh/mykey.pem instancename
+
+EOM
+  exit 2
+}
+if [ $# == 0 ]; then usage; fi
+
+# ref: http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+while [[ $# > 1 ]]
+do
+key="$1"
+
+case $key in
+    -u|--user)
+    SSHUSER="$2"
+    shift # past argument
+    ;;
+    -i|--identity)
+    KEYFILE="$2"
+    shift # past argument
+    ;;
+    --default)
+    DEFAULT=YES
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+INSTANCES=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$1" "Name=instance-state-name,Values=running"`
+
+COUNT=`echo "$INSTANCES" | grep -c ReservationId`
+if [ "$COUNT" -eq 0 ]; then
+  echo "No running instance(s) matching that name."
+  exit 255
+elif [ "$COUNT" -gt 1 ]; then
+  echo "NOTICE: multiple instances matching that name (is this an EB app?) - selecting the first one.";
+fi
+
+# get information from the first instance only, we don't know how to loop with jq/bash
+IP=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].PrivateIpAddress' --raw-output`
+KEYNAME=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].KeyName' --raw-output`
+IMAGE=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].ImageId' --raw-output`
+
+if [ "$IP"  = "null" ]; then
+  echo "Could not determine instance IP to connect to."
+  exit 255
+fi
+
+if [ "${KEYFILE}no" = "no" ]; then
+  if [ "$KEYNAME" = "null" ]; then
+    echo "WARNING: no key defined for instance, good luck connecting automatically!"
+  elif [ ! -f "$HOME/.ssh/$KEYNAME.pem" ]; then
+    echo "ERROR: Private key file $HOME/.ssh/$KEYNAME.pem does not exist."
+    exit 255
+  else
+    KEYFILE="$HOME/.ssh/$KEYNAME.pem"
+  fi
+fi
+
+# lastly figure it out based on image
+if [ "${SSHUSER}no" = "no" ]; then
+  SSHUSER=nobody
+fi
+
+function user_by_image() {
+  # we can hardcode certain things here to save API lookups and more complex logic
+  # Amazon EB image, should always be based on Amazon Linux and use ec2-user
+  if [ "$1" = "ami-87cee4ed" ]; then
+    SSHUSER=ec2-user
+  fi
+  # fallback - use an API call/try to figure it out
+  if [ "$SSHUSER" = "nobody" ]; then
+    IMAGELOC=`aws ec2 describe-images --image-id $1 | jq '.Images[0].ImageLocation'`
+    if [[ $IMAGELOC == *"amazon/aws-elasticbeanstalk"* ]]; then
+      SSHUSER=ec2-user
+    elif [[ $IMAGELOC == *"ubuntu"* ]]; then
+      SSHUSER=ubuntu
+    else
+      echo "NOTICE: no idea what user to select, assuming ec2-user as sensible default."
+      SSHUSER=ec2-user
+    fi
+  fi
+}
+user_by_image $IMAGE
+
+ssh -i $KEYFILE $SSHUSER@$IP
