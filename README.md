@@ -9,10 +9,10 @@ A simple script to remove the headache of figuring out the instance IP, the righ
     * `pip install awscli`
     * `aws configure` needs to be ran to select default region (TODO: add in a sensible default)
 
-* AWS API needs to be accessible, in which one of the following needs to happen:
+* The AWS API needs to be accessible
 
-    * `aws configure` needs to include a valid access and secret key, OR
-    * the instance in which this runs needs to be in an IAM role with (at minimum) `"ec2:Describe*"`
+    * your ~/.aws/credentials or ~/.aws/config needs to have valid keys (created by `aws configure`), OR
+    * the instance in which this runs needs to be in an IAM role that has (at minimum) `"ec2:Describe*"`
 
 * jq (https://stedolan.github.io/jq/) for command-line JSON parsing
 
