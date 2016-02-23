@@ -16,6 +16,13 @@ Requirements:
 
     * `apt-get install jq`
 
+Optional:
+
+* Bash completion
+
+     * `sudo cp ec2ssh.bash_completion.sh /etc/bash_completion.d/ec2ssh`
+     * `source /etc/bash_completion.d/ec2ssh` (or logout and log back in)
+
 Notes:
 
 * All instances must be accessible by private IP. If someone wanted to write logic to check private IP, then fall back to public, that would be neat. However, my use case doesn't require it.
@@ -23,5 +30,4 @@ Notes:
 
 TODO:
 
-* bash completion of instance names
-* if there are mutliple instance matches, prompt the user for which to connect to?
+* if there are mutliple instance matches, could prompt the user for which to connect to
