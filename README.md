@@ -31,11 +31,13 @@ Assumptions:
 
 ### Notes
 
-* This should work inside and outside of a VPC. If the destination is in a VPC, we try the private IP, otherwise, fall back to the public IP. Assumptions are made that peering connections are setup, security groups are open, etc.
+* This should work inside and outside of a VPC. If the destination is in a VPC, we try the private IP, otherwise it will fall back to the public IP.
 * Tries to determine which user to use based on AMI information (and a little hardcoded hint)
 * I've tried my best to make it as failsafe as I can. Bash scripting is annoying, so there might be edge cases where it still breaks.
-* The major caveat currently is each tab completion request is an API hit. If anyone has some nice microcaching idea (that isn't a hacky flatfile thing?) that would be cool.
+* A major caveat currently is each tab completion request is an API hit. Investigating a microcaching solution.
 
 ### TODO
 
+* Add in some microcaching. Easiest to use a flatfile like /tmp/ec2ssh.$username.$minute and a glob remove to remove old files?
 * If there are multiple instance matches, we could prompt the user for which to connect to.
+* If the user leaves a fragment, prompt for the possible options (this would be neat)
