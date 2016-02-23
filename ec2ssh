@@ -70,7 +70,13 @@ elif [ "$COUNT" -gt 1 ]; then
 fi
 
 # get information from the first instance only, we don't know how to loop with jq/bash
-IP=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].PrivateIpAddress' --raw-output`
+VPC=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].VpcId' --raw-output`
+if [ "$VPC" = "null" ]; then
+echo "NO VPC"
+  IP=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].PublicIpAddress' --raw-output`
+else
+  IP=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].PrivateIpAddress' --raw-output`
+fi
 KEYNAME=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].KeyName' --raw-output`
 IMAGE=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].ImageId' --raw-output`
 
@@ -100,6 +106,10 @@ function user_by_image() {
   # Amazon EB image, should always be based on Amazon Linux and use ec2-user
   if [ "$1" = "ami-87cee4ed" ]; then
     SSHUSER=ec2-user
+  fi
+  # i know this is Ubuntu
+  if [ "$1" = "ami-5ab86c32" ]; then
+    SSHUSER=ubuntu
   fi
   # fallback - use an API call/try to figure it out
   if [ "$SSHUSER" = "nobody" ]; then
