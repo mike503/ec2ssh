@@ -34,6 +34,7 @@ Assumptions:
 * This should work inside and outside of a VPC. If the destination is in a VPC, we try the private IP, otherwise, fall back to the public IP. Assumptions are made that peering connections are setup, security groups are open, etc.
 * Tries to determine which user to use based on AMI information (and a little hardcoded hint)
 * I've tried my best to make it as failsafe as I can. Bash scripting is annoying, so there might be edge cases where it still breaks.
+* The major caveat currently is each tab completion request is an API hit. If anyone has some nice microcaching idea (that isn't a hacky flatfile thing?) that would be cool.
 
 ### TODO
 
