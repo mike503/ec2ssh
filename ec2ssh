@@ -72,7 +72,7 @@ fi
 # get information from the first instance only, we don't know how to loop with jq/bash
 VPC=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].VpcId' --raw-output`
 if [ "$VPC" = "null" ]; then
-echo "NO VPC"
+  echo "NOTICE: instance is not in a VPC; connecting to the external IP"
   IP=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].PublicIpAddress' --raw-output`
 else
   IP=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].PrivateIpAddress' --raw-output`
@@ -81,7 +81,7 @@ KEYNAME=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].KeyName' --raw-ou
 IMAGE=`echo "$INSTANCES" | jq '.Reservations[0].Instances[0].ImageId' --raw-output`
 
 if [ "$IP"  = "null" ]; then
-  echo "Could not determine instance IP to connect to."
+  echo "ERROR: Could not determine instance IP to connect to."
   exit 255
 fi
 
@@ -125,5 +125,9 @@ function user_by_image() {
   fi
 }
 user_by_image $IMAGE
+
+echo
+echo "Executing: ssh -i $KEYFILE $SSHUSER@$IP"
+echo
 
 ssh -i $KEYFILE $SSHUSER@$IP
