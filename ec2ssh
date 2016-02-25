@@ -22,7 +22,7 @@ Optional arguments:
 Examples:
 
     Default:
-        ec2 instancename
+        ec2ssh instancename
 
     Overriding the SSH username:
         ec2ssh -u foo instancename
