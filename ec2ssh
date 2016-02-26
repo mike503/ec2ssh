@@ -59,6 +59,10 @@ esac
 shift # past argument or value
 done
 
+# check if ~/.aws/config has "region" key
+# check if AWS_REGION whatever is set
+# if not, default to --region us-east-1 and make a note
+
 INSTANCES=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$1" "Name=instance-state-name,Values=running"`
 
 COUNT=`echo "$INSTANCES" | grep -c ReservationId`
