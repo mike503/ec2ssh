@@ -37,6 +37,7 @@ A simple script to remove the headache of figuring out the instance IP, the righ
 * Tries to determine which user to use based on AMI information (and a little hardcoded hint)
 * I've tried my best to make it as failsafe as I can. Bash scripting is annoying, so there might be edge cases where it still breaks
 * A major caveat currently is each tab completion request is an API hit (investigating a microcaching solution)
+* Currently only supports the default region the "aws" CLI tool uses. Will add a region parameter and possibly the ability to search multiple regions (stretch goal)
 
 ## TODO
 
@@ -44,3 +45,4 @@ A simple script to remove the headache of figuring out the instance IP, the righ
 * If there are multiple instance matches, we could prompt the user for which to connect to
 * If the user leaves a fragment, prompt for the possible options (this would be neat)
 * Add in a sensible default region (check ~/.aws/config first, then AWS_ environment var, if neither exist, then us-east-1 it)
+* Support multiple region search, or at least add in a region parameter (-r?) to override the default region
