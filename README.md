@@ -46,3 +46,7 @@ A simple script to remove the headache of figuring out the instance IP, the righ
 * If the user leaves a fragment, prompt for the possible options (this would be neat)
 * Add in a sensible default region (check ~/.aws/config first, then AWS_ environment var, if neither exist, then us-east-1 it)
 * Support multiple region search, or at least add in a region parameter (-r?) to override the default region
+
+## Related Projects
+
+* https://github.com/mikery/ssh2ec2
