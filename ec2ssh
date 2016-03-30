@@ -63,7 +63,7 @@ done
 # check if AWS_REGION whatever is set
 # if not, default to --region us-east-1 and make a note
 
-INSTANCES=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$1" "Name=instance-state-name,Values=running"`
+INSTANCES=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$1" "Name=instance-state-name,Values=running" --output json`
 
 COUNT=`echo "$INSTANCES" | grep -c ReservationId`
 if [ "$COUNT" -eq 0 ]; then
@@ -117,7 +117,7 @@ function user_by_image() {
   fi
   # fallback - use an API call/try to figure it out
   if [ "$SSHUSER" = "nobody" ]; then
-    IMAGELOC=`aws ec2 describe-images --image-id $1 | jq '.Images[0].ImageLocation'`
+    IMAGELOC=`aws ec2 describe-images --image-id $1 --output json | jq '.Images[0].ImageLocation'`
     if [[ $IMAGELOC == *"amazon/aws-elasticbeanstalk"* ]]; then
       SSHUSER=ec2-user
     elif [[ $IMAGELOC == *"ubuntu"* ]]; then
@@ -134,4 +134,5 @@ echo
 echo "Executing: ssh -i $KEYFILE $SSHUSER@$IP"
 echo
 
+chmod 0400 $KEYFILE
 ssh -i $KEYFILE $SSHUSER@$IP
