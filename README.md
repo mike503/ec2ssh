@@ -25,6 +25,16 @@ A simple script to remove the headache of figuring out the instance IP, the righ
      * `sudo cp ec2ssh.bash_completion.sh /etc/bash_completion.d/ec2ssh`
      * `source /etc/bash_completion.d/ec2ssh` (or logout and log back in)
 
+* ZSH completion
+
+     * run `install-zsh-completions.sh`
+
+* Using with a bastion host ssh proxy
+ 
+     * Used when you have an environemnt var called "SSHPROXYHOST" set to the host name of the bastion host
+     * Expects bastion host to have a working `ec2ssh`
+     * Will pass through all options to `ec2ssh` which is running on the bastion host.
+
 ## Assumptions
 
 * You're actually leaving the ubuntu or ec2-user accounts alone and the authorized_keys they're supposed to have (I've been guilty of this. Not anymore!)

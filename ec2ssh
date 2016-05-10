@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -i
 
 # jq is required: https://stedolan.github.io/jq/
 JQ=`which jq`
@@ -58,6 +58,19 @@ case $key in
 esac
 shift # past argument or value
 done
+
+# if you're using a bastion host
+if [ ! "${SSHPROXYHOST}no" = "no" ]; then
+  if [ ! "${SSHUSER}no" = "no" ]; then
+    ssh -tt $SSHPROXYHOST "ec2ssh -u $SSHUSER $1"
+  elif [ ! "${KEYFILE}no" = "no" ]; then
+    ssh -tt $SSHPROXYHOST "ec2ssh -i $KEYFILE $1"
+  else 
+    ssh -tt $SSHPROXYHOST "ec2ssh $1"
+  fi
+  exit 0
+fi
+
 
 # check if ~/.aws/config has "region" key
 # check if AWS_REGION whatever is set
